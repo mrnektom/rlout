@@ -3,12 +3,18 @@ name = "rlout"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = ["rlout-macro", "rlout-runtime"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rlout-macro = { path = "./rlout-macro" }
+rlout-runtime = { path = "./rlout-runtime" }
 glutin = "0.31.0"
 glutin-winit = "0.4.2"
 skia-safe = { version = "0.67.0", features = ["gl", "svg", "textlayout"] }
 winit = "0.29.2"
 raw-window-handle = { version = "0.5.0" }
 gl-rs = { package = "gl", version = "0.14.0" }
+generational-arena = "0.2.9"

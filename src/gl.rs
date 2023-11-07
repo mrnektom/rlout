@@ -14,6 +14,7 @@ use glutin::{
 };
 use glutin_winit::DisplayBuilder;
 use raw_window_handle::HasRawWindowHandle;
+use skia_safe::{ISize, Size};
 use winit::dpi::PhysicalSize;
 
 use winit::{
@@ -122,11 +123,6 @@ pub(crate) fn init_gl(
 
     let surface = create_surface(&window, fb_info, &mut gr_context, num_samples, stencil_size);
 
-    // Guarantee the drop order inside the FnMut closure. `Window` _must_ be dropped after
-    // `DirectContext`.
-    //
-    // https://github.com/rust-skia/rust-skia/issues/476
-
     let env = Env {
         surface,
         gl_surface,
@@ -173,11 +169,16 @@ impl Env {
 
     pub(crate) fn draw<F>(&mut self, on_draw: F)
     where
-        F: FnOnce(&Canvas),
+        F: FnOnce(&Canvas, Size),
     {
+        let size = Size::from((
+            self.gl_surface.width().expect("") as i32,
+            self.gl_surface.height().expect("") as i32,
+        ));
+
         let canvas = self.surface.canvas();
-        canvas.clear(Color::WHITE);
-        on_draw(canvas);
+        canvas.clear(Color::TRANSPARENT);
+        on_draw(canvas, size);
         self.gr_context.flush_and_submit();
         self.gl_surface.swap_buffers(&self.gl_context).unwrap();
     }
